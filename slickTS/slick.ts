@@ -101,7 +101,7 @@ export class Slick
 
     }
 
-    public addSlide = public slickAdd(markup, index, addBefore) {
+    public addSlide(markup, index, addBefore) { // also called slickAdd
 
         var _ = this;
 
@@ -879,7 +879,7 @@ export class Slick
 
     }
 
-    public filterSlides = public slickFilter(filter) {
+    public filterSlides(filter) { // also called slickFilter
 
         var _ = this;
 
@@ -936,7 +936,7 @@ export class Slick
             );
     }
 
-    public getCurrent = public slickCurrentSlide() {
+    public getCurrent() { // also called slickCurrentSlide
 
         var _ = this;
         return _.currentSlide;
@@ -1123,7 +1123,7 @@ export class Slick
 
     }
 
-    public getOption = public slickGetOption(option) {
+    public getOption(option) { // also called slickGetOption
 
         var _ = this;
 
@@ -1174,7 +1174,7 @@ export class Slick
 
     }
 
-    public goTo = public slickGoTo(slide, dontAnimate) {
+    public goTo(slide, dontAnimate) { // also called slickGoTo
 
         var _ = this;
 
@@ -1579,7 +1579,7 @@ export class Slick
 
     }
 
-    public next = public slickNext() {
+    public next() { // also called slickNext
 
         var _ = this;
 
@@ -1600,7 +1600,7 @@ export class Slick
 
     }
 
-    public pause = public slickPause() {
+    public pause() { // also called slickPause
 
         var _ = this;
 
@@ -1609,7 +1609,7 @@ export class Slick
 
     }
 
-    public play = public slickPlay() {
+    public play() { // also called slickPlay
 
         var _ = this;
 
@@ -1654,7 +1654,7 @@ export class Slick
 
     }
 
-    public prev = public slickPrev() {
+    public prev() { // also called slickPrev
 
         var _ = this;
 
@@ -1885,7 +1885,7 @@ export class Slick
 
     }
 
-    public removeSlide = public slickRemove(index, removeBefore, removeAll) {
+    public removeSlide(index, removeBefore, removeAll) { // also called slickRemove
 
         var _ = this;
 
@@ -2070,8 +2070,7 @@ export class Slick
 
     }
 
-    public setOption =
-    public slickSetOption() {
+    public setOption() { // also called slickSetOption
 
         /**
          * accepts arguments in format of:
@@ -2792,7 +2791,7 @@ export class Slick
 
     }
 
-    public unfilterSlides = public slickUnfilter() {
+    public unfilterSlides() { // also called slickUnfilter
 
         var _ = this;
 
