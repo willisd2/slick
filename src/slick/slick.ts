@@ -1,8 +1,7 @@
 import { Breakpoint } from './breakpoint';
 import { ISlickSettings } from './slick-settings.interface';
 
-
-export class SlickComponent
+export class Slick
 { 
     public animating: boolean = false;
     public dragging: boolean = false;
