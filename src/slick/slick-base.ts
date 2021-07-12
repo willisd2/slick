@@ -42,6 +42,7 @@ export class SlickBase
     protected cssTransitions: boolean = false;
     protected focussed: boolean = false;
     protected interrupted: boolean = false;
+    protected isInitialized: boolean = false;
     protected hidden: string = 'hidden';
     protected originalSettings: SlickSettings;
     protected paused: boolean = true;
@@ -59,7 +60,6 @@ export class SlickBase
     constructor() {
         this.instanceUid = SlickBase.instanceNumber++;
         this.options = new SlickSettings();
-        this.currentSlide = this.options.initialSlide;
     }
 
     public activateADA() {
@@ -765,6 +765,7 @@ export class SlickBase
         _.cleanUpRows();
 
         _.$slider.removeClass('slick-slider');
+        this.isInitialized = false;
         _.$slider.removeClass('slick-initialized');
         _.$slider.removeClass('slick-dotted');
 
@@ -1159,11 +1160,10 @@ export class SlickBase
 
     }
 
-    public init(creation) {
+    public init(creation: boolean) {
 
-        if (!$(this.$slider).hasClass('slick-initialized')) {
-
-            $(this.$slider).addClass('slick-initialized');
+        if (!this.isInitialized) {
+            this.isInitialized = true;
 
             this.buildRows();
             this.buildOut();
@@ -1175,13 +1175,12 @@ export class SlickBase
             this.updateDots();
             this.checkResponsive(true);
             this.focusHandler();
-
         }
 
         if (creation) {
+            this.currentSlide = this.options.initialSlide;
             this.originalSettings = this.options.clone();
             this.registerBreakpoints();
-            this.$slider.trigger('init', [this]);
         }
 
         if (this.options.accessibility === true) {
