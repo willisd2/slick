@@ -1,45 +1,23 @@
-import { SlickBase } from '../slick';
+import $ from 'jquery';
+
+import { SlickSettings } from '../slick/slick-settings';
+import { SlickBase } from '../slick/slick-base';
+import { ISlickSettings } from '../slick/slick-settings.interface'
 
 export class SlickJquery extends SlickBase {
-    constructor() {
+    // A simple way to check for HTML strings
+    // Strict HTML recognition (must start with <)
+    // Extracted from jQuery v1.11 source
+    private htmlExpr: RegExp = /^(?:\s*(<[\w\W]+>)[^>]*)$/;
+
+    constructor(element: HTMLElement, settings: ISlickSettings) {
         super();
-        
-        dataSettings = $(element).data('slick') || {};
 
-        _.options = $.extend({}, _.defaults, settings, dataSettings);
+        const dataSettings: ISlickSettings = $(element).data('slick') || {};
 
-        _.currentSlide = _.options.initialSlide;
+        this.options.extend(settings)
+        this.options.extend(dataSettings);
 
-        _.originalSettings = _.options;
-
-        if (typeof document.mozHidden !== 'undefined') {
-            _.hidden = 'mozHidden';
-            _.visibilityChange = 'mozvisibilitychange';
-        } else if (typeof document.webkitHidden !== 'undefined') {
-            _.hidden = 'webkitHidden';
-            _.visibilityChange = 'webkitvisibilitychange';
-        }
-
-        _.autoPlay = $.proxy(_.autoPlay, _);
-        _.autoPlayClear = $.proxy(_.autoPlayClear, _);
-        _.autoPlayIterator = $.proxy(_.autoPlayIterator, _);
-        _.changeSlide = $.proxy(_.changeSlide, _);
-        _.clickHandler = $.proxy(_.clickHandler, _);
-        _.selectHandler = $.proxy(_.selectHandler, _);
-        _.setPosition = $.proxy(_.setPosition, _);
-        _.swipeHandler = $.proxy(_.swipeHandler, _);
-        _.dragHandler = $.proxy(_.dragHandler, _);
-        _.keyHandler = $.proxy(_.keyHandler, _);
-
-        _.instanceUid = instanceUid++;
-
-        // A simple way to check for HTML strings
-        // Strict HTML recognition (must start with <)
-        // Extracted from jQuery v1.11 source
-        _.htmlExpr = /^(?:\s*(<[\w\W]+>)[^>]*)$/;
-
-
-        _.registerBreakpoints();
-        _.init(true);
+        this.init(true);
     }
 }

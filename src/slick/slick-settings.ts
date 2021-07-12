@@ -1,7 +1,7 @@
 import { Breakpoint } from './breakpoint';
 import { ISlickSettings } from './slick-settings.interface';
 
-export class DefaultSlickSettings implements ISlickSettings {
+export class SlickSettings implements ISlickSettings {
     public accessibility: boolean = true;    
     public adaptiveHeight: boolean = false;
     public appendArrows: JQuery<HTMLElement>= null;
@@ -51,7 +51,22 @@ export class DefaultSlickSettings implements ISlickSettings {
     public waitForAnimate: boolean = true;
     public zIndex: number = 1000;
 
+    public clone(): SlickSettings {
+        return new SlickSettings().extend(this);
+    }
+
     public customPaging(slider: any, i: number): JQuery<HTMLElement> {
         return null;
+    }
+
+    public extend(options: ISlickSettings): SlickSettings{
+        for(let option in options)
+        {
+            if((this as Object).hasOwnProperty(option)) {
+                this[option] = options[option];
+            }
+        }
+        
+        return this;
     }
 }

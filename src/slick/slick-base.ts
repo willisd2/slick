@@ -1,4 +1,5 @@
 import { Breakpoint } from './breakpoint';
+import { SlickSettings } from './slick-settings';
 import { ISlickSettings } from './slick-settings.interface';
 
 export class SlickBase
@@ -10,48 +11,55 @@ export class SlickBase
     public currentLeft: number = null;
     public currentSlide: number = 0;
     public direction: number = 1;
-    public $dots: JQuery<HTMLElement> = null;
+    //public $dots: JQuery<HTMLElement> = null;
+    public readonly instanceUid: number;
     public listWidth: number = null;
     public listHeight: number = null;
     public loadIndex: number = 0;
-    public $nextArrow: JQuery<HTMLElement> = null;
-    public $prevArrow: JQuery<HTMLElement> = null;
+    //public $nextArrow: JQuery<HTMLElement> = null;
+    public options: SlickSettings;
+    //public $prevArrow: JQuery<HTMLElement> = null;
     public scrolling: boolean = false;
     public slideCount: number = null;
     public slideWidth: number = null;
-    public $slideTrack: JQuery<HTMLElement> = null;
-    public $slides: JQuery<HTMLElement> = null;
+    //public $slideTrack: JQuery<HTMLElement> = null;
+    //public $slides: JQuery<HTMLElement> = null;
     public sliding: boolean = false;
     public slideOffset: number = 0;
     public swipeLeft: number = null;
     public swiping: boolean = false;
-    public $list: JQuery<HTMLElement> = null;
+    //public $list: JQuery<HTMLElement> = null;
     public touchObject: any = {};
     public transformsEnabled: boolean = false;
     public unslicked: boolean = false;
 
-    private activeBreakpoint: number = null;
-    private animType: 'OTransform' | 'MozTransform' | 'webkitTransform' | 'msTransform' | 'transform' | boolean = null;
-    private breakpoints: Array<number> = [];
-    private breakpointSettings: Array<ISlickSettings> = [];
-    private cssTransitions: boolean = false;
-    private focussed: boolean = false;
-    private interrupted: boolean = false;
-    private hidden: string = 'hidden';
-    private paused: boolean = true;
-    private positionProp: 'top' | 'left' = null;
-    private respondTo: 'min' | 'slider' | 'window' = null;
-    private rowCount: number = 1;
-    private shouldClick: boolean = true;
-    private $slider: JQuery<HTMLElement> = $(element);
-    private $slidesCache: JQuery<HTMLElement> = null;
-    private transformType: '-o-transform' | '-moz-transform' | '-webkit-transform' | '-ms-transform' | 'transform' = null;
-    private transitionType: 'OTransition' | 'MozTransition' | 'webkitTransition' | 'msTransition' | 'transition'  = null;
-    private visibilityChange: string = 'visibilitychange';
-    private windowWidth: number = 0;
+    protected static instanceNumber: number = 0;
+
+    protected activeBreakpoint: number = null;
+    protected animType: 'OTransform' | 'MozTransform' | 'webkitTransform' | 'msTransform' | 'transform' | boolean = null;
+    protected breakpoints: Array<number> = [];
+    protected breakpointSettings: Array<ISlickSettings> = [];
+    protected cssTransitions: boolean = false;
+    protected focussed: boolean = false;
+    protected interrupted: boolean = false;
+    protected hidden: string = 'hidden';
+    protected originalSettings: SlickSettings;
+    protected paused: boolean = true;
+    protected positionProp: 'top' | 'left' = null;
+    protected respondTo: 'min' | 'slider' | 'window' = null;
+    protected rowCount: number = 1;
+    protected shouldClick: boolean = true;
+    //protected $slider: JQuery<HTMLElement> = $(element);
+    //protected $slidesCache: JQuery<HTMLElement> = null;
+    protected transformType: '-o-transform' | '-moz-transform' | '-webkit-transform' | '-ms-transform' | 'transform' = null;
+    protected transitionType: 'OTransition' | 'MozTransition' | 'webkitTransition' | 'msTransition' | 'transition'  = null;
+    protected visibilityChange: string = 'visibilitychange';
+    protected windowWidth: number = 0;
 
     constructor() {
-        
+        this.instanceUid = SlickBase.instanceNumber++;
+        this.options = new SlickSettings();
+        this.currentSlide = this.options.initialSlide;
     }
 
     public activateADA() {
@@ -1153,40 +1161,37 @@ export class SlickBase
 
     public init(creation) {
 
-        var _ = this;
+        if (!$(this.$slider).hasClass('slick-initialized')) {
 
-        if (!$(_.$slider).hasClass('slick-initialized')) {
+            $(this.$slider).addClass('slick-initialized');
 
-            $(_.$slider).addClass('slick-initialized');
-
-            _.buildRows();
-            _.buildOut();
-            _.setProps();
-            _.startLoad();
-            _.loadSlider();
-            _.initializeEvents();
-            _.updateArrows();
-            _.updateDots();
-            _.checkResponsive(true);
-            _.focusHandler();
+            this.buildRows();
+            this.buildOut();
+            this.setProps();
+            this.startLoad();
+            this.loadSlider();
+            this.initializeEvents();
+            this.updateArrows();
+            this.updateDots();
+            this.checkResponsive(true);
+            this.focusHandler();
 
         }
 
         if (creation) {
-            _.$slider.trigger('init', [_]);
+            this.originalSettings = this.options.clone();
+            this.registerBreakpoints();
+            this.$slider.trigger('init', [this]);
         }
 
-        if (_.options.accessibility === true) {
-            _.initADA();
+        if (this.options.accessibility === true) {
+            this.initADA();
         }
 
-        if ( _.options.autoplay ) {
-
-            _.paused = false;
-            _.autoPlay();
-
+        if (this.options.autoplay) {
+            this.paused = false;
+            this.autoPlay();
         }
-
     }
 
     public initADA() {
