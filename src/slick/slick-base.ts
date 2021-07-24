@@ -2,7 +2,7 @@ import { Breakpoint } from './breakpoint';
 import { SlickSettings } from './slick-settings';
 import { ISlickSettings } from './slick-settings.interface';
 
-export class SlickBase
+export abstract class SlickBase
 { 
     public animating: boolean = false;
     public dragging: boolean = false;
@@ -11,30 +11,32 @@ export class SlickBase
     public currentLeft: number = null;
     public currentSlide: number = 0;
     public direction: number = 1;
-    //public $dots: JQuery<HTMLElement> = null;
     public readonly instanceUid: number;
     public listWidth: number = null;
     public listHeight: number = null;
     public loadIndex: number = 0;
-    //public $nextArrow: JQuery<HTMLElement> = null;
     public options: SlickSettings;
-    //public $prevArrow: JQuery<HTMLElement> = null;
     public scrolling: boolean = false;
     public slideCount: number = null;
     public slideWidth: number = null;
-    //public $slideTrack: JQuery<HTMLElement> = null;
-    //public $slides: JQuery<HTMLElement> = null;
     public sliding: boolean = false;
     public slideOffset: number = 0;
     public swipeLeft: number = null;
     public swiping: boolean = false;
-    //public $list: JQuery<HTMLElement> = null;
     public touchObject: any = {};
     public transformsEnabled: boolean = false;
     public unslicked: boolean = false;
-
+    //public $dots: JQuery<HTMLElement> = null;
+    //public $list: JQuery<HTMLElement> = null;
+    //public $nextArrow: JQuery<HTMLElement> = null;
+    //public $prevArrow: JQuery<HTMLElement> = null;
+    //public $slides: JQuery<HTMLElement> = null;
+    //public $slideTrack: JQuery<HTMLElement> = null;
+    //protected $slider: JQuery<HTMLElement> = $(element);
+    //protected $slidesCache: JQuery<HTMLElement> = null;
+    
     protected static instanceNumber: number = 0;
-
+    
     protected activeBreakpoint: number = null;
     protected animType: 'OTransform' | 'MozTransform' | 'webkitTransform' | 'msTransform' | 'transform' | boolean = null;
     protected breakpoints: Array<number> = [];
@@ -43,15 +45,13 @@ export class SlickBase
     protected focussed: boolean = false;
     protected interrupted: boolean = false;
     protected isInitialized: boolean = false;
-    protected hidden: string = 'hidden';
+    protected hidden: 'hidden' | 'mozHidden' | 'webkitHidden' = 'hidden';
     protected originalSettings: SlickSettings;
     protected paused: boolean = true;
     protected positionProp: 'top' | 'left' = null;
     protected respondTo: 'min' | 'slider' | 'window' = null;
     protected rowCount: number = 1;
     protected shouldClick: boolean = true;
-    //protected $slider: JQuery<HTMLElement> = $(element);
-    //protected $slidesCache: JQuery<HTMLElement> = null;
     protected transformType: '-o-transform' | '-moz-transform' | '-webkit-transform' | '-ms-transform' | 'transform' = null;
     protected transitionType: 'OTransition' | 'MozTransition' | 'webkitTransition' | 'msTransition' | 'transition'  = null;
     protected visibilityChange: string = 'visibilitychange';
@@ -60,17 +60,15 @@ export class SlickBase
     constructor() {
         this.instanceUid = SlickBase.instanceNumber++;
         this.options = new SlickSettings();
-    }
 
-    public activateADA() {
-        var _ = this;
-
-        _.$slideTrack.find('.slick-active').attr({
-            'aria-hidden': 'false'
-        }).find('a, input, button, select').attr({
-            'tabindex': '0'
-        });
-
+        // TODO: this block seems sus
+        if ((typeof document as any).mozHidden !== 'undefined') {
+            this.hidden = 'mozHidden';
+            this.visibilityChange = 'mozvisibilitychange';
+        } else if ((typeof document as any).webkitHidden !== 'undefined') {
+            this.hidden = 'webkitHidden';
+            this.visibilityChange = 'webkitvisibilitychange';
+        }
     }
 
     public addSlide(markup, index, addBefore) { // also called slickAdd
@@ -453,7 +451,7 @@ export class SlickBase
 
     }
 
-    public checkResponsive(initial, forceUpdate) {
+    public checkResponsive(initial: boolean, forceUpdate: boolean = false) {
 
         var _ = this,
             breakpoint, targetBreakpoint, respondToWidth, triggerBreakpoint = false;
@@ -1057,7 +1055,7 @@ export class SlickBase
 
     }
 
-    public getNavigableIndexes() {
+    public getNavigableIndexes(): Array<number> {
 
         var _ = this,
             breakPoint = 0,
@@ -1191,74 +1189,6 @@ export class SlickBase
             this.paused = false;
             this.autoPlay();
         }
-    }
-
-    public initADA() {
-        var _ = this,
-                numDotGroups = Math.ceil(_.slideCount / _.options.slidesToShow),
-                tabControlIndexes = _.getNavigableIndexes().filter(function(val) {
-                    return (val >= 0) && (val < _.slideCount);
-                });
-
-        _.$slides.add(_.$slideTrack.find('.slick-cloned')).attr({
-            'aria-hidden': 'true',
-            'tabindex': '-1'
-        }).find('a, input, button, select').attr({
-            'tabindex': '-1'
-        });
-
-        if (_.$dots !== null) {
-            _.$slides.not(_.$slideTrack.find('.slick-cloned')).each(function(i) {
-                var slideControlIndex = tabControlIndexes.indexOf(i);
-
-                $(this).attr({
-                    'role': 'tabpanel',
-                    'id': 'slick-slide' + _.instanceUid + i,
-                    'tabindex': -1
-                });
-
-                if (slideControlIndex !== -1) {
-                   var ariaButtonControl = 'slick-slide-control' + _.instanceUid + slideControlIndex
-                   if ($('#' + ariaButtonControl).length) {
-                     $(this).attr({
-                         'aria-describedby': ariaButtonControl
-                     });
-                   }
-                }
-            });
-
-            _.$dots.attr('role', 'tablist').find('li').each(function(i) {
-                var mappedSlideIndex = tabControlIndexes[i];
-
-                $(this).attr({
-                    'role': 'presentation'
-                });
-
-                $(this).find('button').first().attr({
-                    'role': 'tab',
-                    'id': 'slick-slide-control' + _.instanceUid + i,
-                    'aria-controls': 'slick-slide' + _.instanceUid + mappedSlideIndex,
-                    'aria-label': (i + 1) + ' of ' + numDotGroups,
-                    'aria-selected': null,
-                    'tabindex': '-1'
-                });
-
-            }).eq(_.currentSlide).find('button').attr({
-                'aria-selected': 'true',
-                'tabindex': '0'
-            }).end();
-        }
-
-        for (var i=_.currentSlide, max=i+_.options.slidesToShow; i < max; i++) {
-          if (_.options.focusOnChange) {
-            _.$slides.eq(i).attr({'tabindex': '0'});
-          } else {
-            _.$slides.eq(i).removeAttr('tabindex');
-          }
-        }
-
-        _.activateADA();
-
     }
 
     public initArrowEvents() {
@@ -2884,4 +2814,6 @@ export class SlickBase
         }
 
     }
+
+    protected abstract initADA(): void;
 }
